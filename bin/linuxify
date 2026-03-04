@@ -209,26 +209,24 @@ async function setupModeSelection() {
       return 'sudo-run-active';
     } else {
       log('\n' + '='.repeat(60), 'yellow');
-      log('⚠ SUDO RUN MODE INSTRUCTIONS', 'yellow');
+      log('⚠ RESTARTING WITH SUDO', 'yellow');
       log('='.repeat(60) + '\n', 'yellow');
       
-      log('To run Linuxify in sudo mode, use:\n', 'bright');
-      log('  sudo PATH=$PATH bash bin/linuxify.sh\n', 'blue');
+      log('Linuxify needs to run with sudo for this mode.', 'yellow');
+      log('Restarting with elevated privileges...\n', 'yellow');
       
-      log('Or preserve entire environment:\n', 'bright');
-      log('  sudo -E bash bin/linuxify.sh\n', 'blue');
+      // Get the current script path
+      const scriptPath = process.argv[1];
       
-      log('Or with full path to node:\n', 'bright');
-      log(`  sudo ${process.execPath} bin/linuxify\n`, 'blue');
+      // Restart with sudo using the same PATH
+      const currentPath = process.env.PATH || '';
+      const result = spawnSync('sudo', ['bash', '-c', `PATH=$currentPath bash "${scriptPath}" --skip-setup`], {
+        stdio: 'inherit',
+        env: { ...process.env, PATH: currentPath }
+      });
       
-      log('Security Notes:', 'yellow');
-      log('  • The web interface will run as root', 'dim');
-      log('  • Only access from localhost (127.0.0.1)', 'dim');
-      log('  • Do not expose to network', 'dim');
-      log('  • All operations have full root access', 'dim');
-      log('');
-      
-      return 'sudo-run-inactive';
+      // Exit with the same code as the sudo command
+      process.exit(result.status || 0);
     }
   } else {
     log('\nSetup skipped\n', 'yellow');
