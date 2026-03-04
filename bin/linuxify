@@ -218,12 +218,26 @@ async function setupModeSelection() {
       // Get the current script path
       const scriptPath = process.argv[1];
       
-      // Restart with sudo using the same PATH
-      const currentPath = process.env.PATH || '';
-      const result = spawnSync('sudo', ['bash', '-c', `PATH=$currentPath bash "${scriptPath}" --skip-setup`], {
-        stdio: 'inherit',
-        env: { ...process.env, PATH: currentPath }
-      });
+      // Restart with sudo, passing the full command
+      // Close the readline interface first
+      rl.close();
+      
+      // Use the wrapper script if available, otherwise use the node path directly
+      const wrapperScript = path.join(__dirname, 'linuxify.sh');
+      const hasWrapper = fs.existsSync(wrapperScript);
+      
+      let result;
+      if (hasWrapper) {
+        // Use the wrapper script method
+        result = spawnSync('sudo', ['PATH=' + process.env.PATH, '/bin/bash', wrapperScript, '--skip-setup'], {
+          stdio: 'inherit'
+        });
+      } else {
+        // Fall back to direct node execution
+        result = spawnSync('sudo', ['PATH=' + process.env.PATH, process.execPath, scriptPath, '--skip-setup'], {
+          stdio: 'inherit'
+        });
+      }
       
       // Exit with the same code as the sudo command
       process.exit(result.status || 0);
