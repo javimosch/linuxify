@@ -34,9 +34,44 @@ npx linuxify
 ```
 
 This will:
-1. Show an interactive setup wizard
-2. Optionally configure sudoers for passwordless commands
+1. Show an interactive setup wizard to choose your preferred setup mode
+2. Configure either sudoers or run directly with sudo
 3. Start the application automatically
+
+### Installation Options
+
+Two setup modes are available. The setup wizard will guide you through both options:
+
+#### 1. **Sudoers Mode** (Recommended for security-conscious users)
+```bash
+npx linuxify
+# Select option "1" when prompted
+```
+- ✅ Configure sudoers file once during setup
+- ✅ Run Linuxify as regular user afterwards
+- ✅ Commands execute with limited, scoped sudo permissions
+- ⚠️ Requires understanding of sudoers configuration
+- ⚠️ Exposes commands to sudoers file (potential privilege escalation vector if other apps exploit sudoers)
+
+#### 2. **Sudo Run Mode** (Simpler, full control)
+```bash
+sudo npx linuxify
+# Or select option "2" when prompted for sudo-run instructions
+```
+- ✅ No sudoers configuration needed
+- ✅ Simplest setup (just one command with sudo)
+- ✅ Full root privileges, complete control
+- ⚠️ Web interface runs as root (security consideration)
+- ⚠️ Should only be accessed from localhost
+- ⚠️ Should not be exposed to network/internet
+
+#### 3. **Skip Setup** (Manual configuration later)
+```bash
+npx linuxify
+# Select option "0" when prompted
+```
+- Run without any setup
+- Configure manually later with `npx linuxify --setup` or `sudo bash setup.sh`
 
 ### Manual Installation
 

@@ -6,6 +6,10 @@ const { getSystemInfo, runCleanup, CLEANUP_ACTIONS } = require('./modules/system
 const app = express();
 const PORT = 3000;
 
+// Detect if running with sudo (elevated privileges)
+const RUNNING_WITH_SUDO = process.getuid?.() === 0;
+const SUDO_USER = process.env.SUDO_USER || process.env.USER || 'root';
+
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.use(express.static(__dirname + '/public'));
@@ -18,7 +22,14 @@ app.get('/', async (req, res) => {
     getExtensions()
   ]);
   
-  res.render('index', { systemInfo, services, extensions, cleanupActions: CLEANUP_ACTIONS });
+  res.render('index', { 
+    systemInfo, 
+    services, 
+    extensions, 
+    cleanupActions: CLEANUP_ACTIONS,
+    sudoMode: RUNNING_WITH_SUDO,
+    sudoUser: SUDO_USER
+  });
 });
 
 app.post('/api/service/:name', async (req, res) => {
@@ -46,6 +57,17 @@ app.get('/api/system', async (req, res) => {
   res.json(systemInfo);
 });
 
+// Info endpoint to show current mode
+app.get('/api/mode', (req, res) => {
+  res.json({
+    sudoMode: RUNNING_WITH_SUDO,
+    sudoUser: SUDO_USER,
+    port: PORT,
+    pid: process.pid
+  });
+});
+
 app.listen(PORT, () => {
-  console.log(`Linuxify running at http://localhost:${PORT}`);
+  const modeText = RUNNING_WITH_SUDO ? `(sudo mode - user: ${SUDO_USER})` : '(sudoers mode)';
+  console.log(`Linuxify running at http://localhost:${PORT} ${modeText}`);
 });

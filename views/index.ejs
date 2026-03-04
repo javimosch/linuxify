@@ -17,6 +17,23 @@
 </head>
 <body class="bg-base-100 min-h-screen">
   <div id="app">
+    <!-- Mode Indicator Banner -->
+    <% if (sudoMode) { %>
+    <div class="alert alert-warning shadow-lg">
+      <div class="flex items-start gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6 mt-0.5" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2M6.91 20.666h10.18c1.105 0 2.058-.665 2.468-1.694l4.253-10.227c.693-1.67-.178-3.576-1.878-3.909-.391-.08-.795-.08-1.186 0L18 9m0 0V7.5A2.5 2.5 0 0015.5 5h-7A2.5 2.5 0 006 7.5V9m0 0l4.253-10.227c.693-1.67-.178-3.576-1.878-3.909"></path></svg>
+        <div class="flex-1">
+          <h3 class="font-bold">Sudo Mode Active</h3>
+          <div class="text-sm mt-2 space-y-1">
+            <p>⚠ Web interface running as root (full privileges)</p>
+            <p>⚠ Only access from localhost recommended</p>
+            <p>⚠ Do not expose to network/internet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+
     <div class="navbar bg-base-200 shadow-lg sticky top-0 z-50">
       <div class="flex-1">
         <a class="btn btn-ghost text-xl">Linuxify</a>
@@ -302,16 +319,17 @@
     const { createApp, ref, computed, onMounted } = Vue;
 
     createApp({
-      setup() {
-        const systemInfo = ref(<%- JSON.stringify(systemInfo) %>);
-        const services = ref(<%- JSON.stringify(services) %>);
-        const extensions = ref(<%- JSON.stringify(extensions) %>);
-        const loading = ref({});
-        const loadingAll = ref(false);
-        const cleanupLoading = ref({});
-        const activeTab = ref('services');
-        const serviceFilter = ref('optimizable');
-        const cleanupActions = ref(<%- JSON.stringify(cleanupActions) %>);
+       setup() {
+         const systemInfo = ref(<%- JSON.stringify(systemInfo) %>);
+         const services = ref(<%- JSON.stringify(services) %>);
+         const extensions = ref(<%- JSON.stringify(extensions) %>);
+         const loading = ref({});
+         const loadingAll = ref(false);
+         const cleanupLoading = ref({});
+         const activeTab = ref('services');
+         const serviceFilter = ref('optimizable');
+         const cleanupActions = ref(<%- JSON.stringify(cleanupActions) %>);
+         const sudoMode = ref(<%- JSON.stringify(sudoMode) %>);
 
         const filteredServices = computed(() => {
           if (serviceFilter.value === 'all') return services.value;
@@ -388,24 +406,25 @@
           setInterval(refresh, 5000);
         });
 
-        return {
-          systemInfo,
-          services,
-          extensions,
-          loading,
-          loadingAll,
-          cleanupLoading,
-          activeTab,
-          serviceFilter,
-          filteredServices,
-          loadClass,
-          refresh,
-          toggleService,
-          toggleExtension,
-          disableAllExtensions,
-          cleanupActions,
-          runCleanup
-        };
+         return {
+           systemInfo,
+           services,
+           extensions,
+           loading,
+           loadingAll,
+           cleanupLoading,
+           activeTab,
+           serviceFilter,
+           filteredServices,
+           loadClass,
+           sudoMode,
+           refresh,
+           toggleService,
+           toggleExtension,
+           disableAllExtensions,
+           cleanupActions,
+           runCleanup
+         };
       }
     }).mount('#app');
   </script>

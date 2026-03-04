@@ -172,6 +172,66 @@ async function setupSudoers() {
   }
 }
 
+async function setupModeSelection() {
+  log('\n' + '='.repeat(60), 'bright');
+  log('SETUP MODE SELECTION', 'bright');
+  log('='.repeat(60) + '\n', 'bright');
+
+  log('Linuxify can be configured in two ways:\n', 'yellow');
+
+  log('1. SUDOERS MODE (Recommended for security-conscious users)', 'bright');
+  log('   ✓ Configure sudoers file once', 'green');
+  log('   ✓ Run Linuxify as regular user afterwards', 'green');
+  log('   ✓ Commands execute with limited sudo scope', 'green');
+  log('   ✗ Requires visudo configuration', 'dim');
+  log('   ✗ Exposes commands to sudoers (potential privilege escalation vector)', 'dim');
+  log('');
+
+  log('2. SUDO RUN MODE (Simpler, full control)', 'bright');
+  log('   ✓ Run Linuxify directly with sudo: sudo npx linuxify', 'green');
+  log('   ✓ No sudoers configuration needed', 'green');
+  log('   ✓ Full root privileges, complete control', 'green');
+  log('   ✓ Easiest setup (just one command)', 'green');
+  log('   ⚠ Web interface runs as root (security consideration)', 'yellow');
+  log('   ⚠ Only access from localhost recommended', 'yellow');
+  log('');
+
+  const choice = await prompt('Which mode do you prefer? (1=sudoers, 2=sudo-run, 0=skip)');
+
+  if (choice === '1') {
+    log('\n✓ Sudoers mode selected\n', 'green');
+    return 'sudoers';
+  } else if (choice === '2') {
+    log('\n✓ Sudo run mode selected\n', 'green');
+    
+    if (isRunningAsRoot()) {
+      log('✓ Already running with sudo - ready to go!\n', 'green');
+      return 'sudo-run-active';
+    } else {
+      log('\n' + '='.repeat(60), 'yellow');
+      log('⚠ SUDO RUN MODE INSTRUCTIONS', 'yellow');
+      log('='.repeat(60) + '\n', 'yellow');
+      
+      log('To run Linuxify in sudo mode, use:\n', 'bright');
+      log('  sudo npx linuxify\n', 'blue');
+      log('Or if already installed locally:\n', 'blue');
+      log('  sudo npm run cli\n', 'blue');
+      
+      log('Security Notes:', 'yellow');
+      log('  • The web interface will run as root', 'dim');
+      log('  • Only access from localhost (127.0.0.1)', 'dim');
+      log('  • Do not expose to network', 'dim');
+      log('  • All operations have full root access', 'dim');
+      log('');
+      
+      return 'sudo-run-inactive';
+    }
+  } else {
+    log('\nSetup skipped\n', 'yellow');
+    return 'skip';
+  }
+}
+
 async function runSetupWizard() {
   log('\n' + '╔' + '═'.repeat(58) + '╗', 'bright');
   log('║' + ' '.repeat(58) + '║', 'bright');
@@ -194,14 +254,30 @@ async function runSetupWizard() {
     process.exit(1);
   }
 
-  // Run sudoers setup
-  const sudoersSuccess = await setupSudoers();
-  if (!sudoersSuccess) {
-    const cont = await prompt('Continue without sudoers configuration? (y/n)');
-    if (cont !== 'y') {
-      rl.close();
-      process.exit(0);
+  // Get user's preferred setup mode
+  const mode = await setupModeSelection();
+
+  // Handle based on selected mode
+  if (mode === 'sudoers') {
+    // Run sudoers setup
+    const sudoersSuccess = await setupSudoers();
+    if (!sudoersSuccess) {
+      const cont = await prompt('Continue without sudoers configuration? (y/n)');
+      if (cont !== 'y') {
+        rl.close();
+        process.exit(0);
+      }
     }
+  } else if (mode === 'sudo-run-active') {
+    // Already running as root, ready to go
+    log('✓ Everything is set up!\n', 'green');
+  } else if (mode === 'sudo-run-inactive') {
+    // Instructions already shown by setupModeSelection()
+    log('Run the command above to start Linuxify with sudo mode.\n', 'yellow');
+    rl.close();
+    process.exit(0);
+  } else if (mode === 'skip') {
+    log('You can run setup anytime with: npx linuxify --setup\n', 'yellow');
   }
 
   log('\n✓ Setup complete! Starting Linuxify...\n', 'green');
