@@ -55,19 +55,25 @@ npx linuxify
 
 #### 2. **Sudo Run Mode** (Simpler, full control)
 
-**From the project directory (Recommended):**
+**Method 1: Preserve PATH (Recommended)**
 ```bash
 cd linuxify
-sudo bash bin/linuxify.sh
+sudo PATH=$PATH bash bin/linuxify.sh
 ```
 
-**If installed globally:**
+**Method 2: Preserve entire environment**
 ```bash
-# Get the full path to the wrapper script
-sudo $(which linuxify.sh)
+cd linuxify
+sudo -E bash bin/linuxify.sh
 ```
 
-The `linuxify.sh` wrapper script preserves your environment (including PATH) so it can properly locate Node.js, even when running with sudo.
+**Method 3: Use full path to node**
+```bash
+cd linuxify
+sudo $(which node) bin/linuxify
+```
+
+The `PATH=$PATH` or `-E` flag tells sudo to preserve your environment variables so it can find Node.js, even with NVM, Homebrew, or other custom installations.
 - ✅ No sudoers configuration needed
 - ✅ Simplest setup (just one command with sudo)
 - ✅ Full root privileges, complete control
@@ -178,16 +184,21 @@ This approach runs Linuxify directly as root with full privileges, without needi
 
 ```bash
 cd linuxify
-sudo bash bin/linuxify.sh
+sudo PATH=$PATH bash bin/linuxify.sh
 ```
 
-The `linuxify.sh` wrapper script handles the sudo environment properly, preserving PATH and other necessary variables so Node.js can be located and executed.
+Or to preserve the entire environment:
 
-**Why the wrapper script?**
-- sudo strips the PATH by default for security
-- Direct `node`, `npm`, `npx` commands fail with "command not found"
-- The bash wrapper finds and uses the user's node executable
-- Works with NVM, Homebrew, system Node, and other installations
+```bash
+cd linuxify
+sudo -E bash bin/linuxify.sh
+```
+
+**Why PATH preservation matters:**
+- `sudo` strips environment variables for security
+- Without it, sudo can't find `node` from NVM, Homebrew, etc.
+- `PATH=$PATH` or `-E` explicitly tells sudo to preserve these
+- The bash wrapper then finds and executes node properly
 
 **Security Considerations:**
 - ⚠️ The web interface runs as root (all operations have full system access)

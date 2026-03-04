@@ -212,17 +212,14 @@ async function setupModeSelection() {
       log('⚠ SUDO RUN MODE INSTRUCTIONS', 'yellow');
       log('='.repeat(60) + '\n', 'yellow');
       
-      // Get the path to the wrapper script
-      const wrapperScript = path.join(__dirname, 'linuxify.sh');
-      
       log('To run Linuxify in sudo mode, use:\n', 'bright');
-      log(`  sudo ${wrapperScript}\n`, 'blue');
+      log('  sudo PATH=$PATH bash bin/linuxify.sh\n', 'blue');
       
-      log('Or if installed globally via npx:\n', 'bright');
-      log(`  sudo $(which linuxify.sh)\n`, 'blue');
+      log('Or preserve entire environment:\n', 'bright');
+      log('  sudo -E bash bin/linuxify.sh\n', 'blue');
       
-      log('Or from the project directory with full path to node:\n', 'bright');
-      log('  sudo bash bin/linuxify.sh\n', 'blue');
+      log('Or with full path to node:\n', 'bright');
+      log(`  sudo ${process.execPath} bin/linuxify\n`, 'blue');
       
       log('Security Notes:', 'yellow');
       log('  • The web interface will run as root', 'dim');
