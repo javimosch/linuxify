@@ -54,17 +54,20 @@ npx linuxify
 - ⚠️ Exposes commands to sudoers file (potential privilege escalation vector if other apps exploit sudoers)
 
 #### 2. **Sudo Run Mode** (Simpler, full control)
+
+**If installed globally via npx:**
 ```bash
-# If installed globally
+# Get the full path to npx and use it with sudo
 sudo $(which npx) linuxify
-
-# Or if in project directory
-cd linuxify
-sudo npm run cli
-
-# Or using node directly
-sudo node bin/linuxify
 ```
+
+**From the project directory:**
+```bash
+cd linuxify
+sudo -E npm run cli
+```
+
+The `-E` flag preserves your user's environment (including PATH to find npm).
 - ✅ No sudoers configuration needed
 - ✅ Simplest setup (just one command with sudo)
 - ✅ Full root privileges, complete control
@@ -174,16 +177,18 @@ This approach runs Linuxify directly as root with full privileges, without needi
 **Setup**
 
 ```bash
-# If installed globally
+# Get the full path to npx and use it with sudo
 sudo $(which npx) linuxify
-
-# Or navigate to project and run with node directly
-cd linuxify
-sudo node bin/linuxify
-
-# Or use npm script
-sudo npm run cli
 ```
+
+Or from the project directory:
+
+```bash
+cd linuxify
+sudo -E npm run cli
+```
+
+Note: The `-E` flag preserves your environment's PATH so sudo can find npm. If using NVM or other Node version managers, this is necessary.
 
 **Security Considerations:**
 - ⚠️ The web interface runs as root (all operations have full system access)
