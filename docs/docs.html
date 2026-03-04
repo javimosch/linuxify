@@ -26,6 +26,8 @@
       <div class="card-body">
         <h2 class="card-title">Table of Contents</h2>
         <ul class="list-disc list-inside space-y-1">
+          <li><a href="#quick-start" class="link link-primary">Quick Start</a></li>
+          <li><a href="#setup-wizard" class="link link-primary">Setup Wizard</a></li>
           <li><a href="#installation" class="link link-primary">Installation</a></li>
           <li><a href="#configuration" class="link link-primary">Configuration</a></li>
           <li><a href="#sudo-setup" class="link link-primary">Sudo Setup</a></li>
@@ -34,10 +36,110 @@
           <li><a href="#cleanup" class="link link-primary">Disk Cleanup</a></li>
           <li><a href="#api" class="link link-primary">API Reference</a></li>
           <li><a href="#troubleshooting" class="link link-primary">Troubleshooting</a></li>
+          <li><a href="#mode-comparison" class="link link-primary">Mode Comparison</a></li>
+          <li><a href="#security" class="link link-primary">Security Considerations</a></li>
           <li><a href="#architecture" class="link link-primary">Architecture</a></li>
         </ul>
       </div>
     </div>
+
+    <!-- Quick Start -->
+    <section id="quick-start" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Quick Start</h2>
+      <div class="card bg-base-200">
+        <div class="card-body space-y-4">
+          <p>Linuxify supports two different modes of operation. When you first run it, you'll be presented with an interactive setup wizard:</p>
+          <pre class="bg-base-100 p-4 rounded overflow-x-auto"><code>cd ~/projects/optimize-linux/webui
+npm install
+npm run dev</code></pre>
+          <p>This will launch the setup wizard where you can choose your preferred mode:</p>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>Sudoers Mode</strong> - Configure once, then run as regular user</li>
+            <li><strong>Sudo Run Mode</strong> - Run directly with <code class="bg-base-300 px-1">sudo</code> (auto-restarts)</li>
+          </ul>
+          <p class="mt-4"><strong>Visit:</strong> <code class="bg-base-100 px-2 py-1 rounded">http://localhost:3000</code></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Setup Wizard -->
+    <section id="setup-wizard" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Setup Wizard</h2>
+      <div class="space-y-4">
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Wizard Prompt</h3>
+            <p>When you run <code class="bg-base-300 px-1">npm run dev</code>, you'll see:</p>
+            <pre class="bg-base-100 p-4 rounded overflow-x-auto text-sm mt-3"><code>🔧 Linux Optimizer WebUI - Setup Wizard
+
+Choose your operating mode:
+
+1) Sudoers Mode
+   - Configure sudoers file once
+   - Run as regular user with limited sudo scope
+   - Password prompts for each operation
+
+2) Sudo Run Mode
+   - Run directly with 'sudo'
+   - Full root access
+   - Will auto-restart with sudo
+
+Enter your choice (1 or 2):</code></pre>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Mode 1: Sudoers Mode (Recommended)</h3>
+            <p class="mb-3">Select option <code class="bg-base-300 px-1">1</code> to configure the sudoers file. The app will:</p>
+            <ol class="list-decimal list-inside space-y-2 mb-4">
+              <li>Show you a setup script that configures sudoers for Linuxify</li>
+              <li>Run the script automatically (or you can run it manually)</li>
+              <li>Create backups of your original sudoers file</li>
+              <li>Validate the new sudoers configuration</li>
+            </ol>
+            <p class="mb-3"><strong>Advantages:</strong></p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>✅ Most secure - limited sudo scope</li>
+              <li>✅ No password prompts (after configuration)</li>
+              <li>✅ Runs as regular user (safer)</li>
+              <li>✅ Better for multi-user systems</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Mode 2: Sudo Run Mode (Simplest Setup)</h3>
+            <p class="mb-3">Select option <code class="bg-base-300 px-1">2</code> to run directly with sudo. The app will:</p>
+            <ol class="list-decimal list-inside space-y-2 mb-4">
+              <li>Automatically restart itself with <code class="bg-base-300 px-1">sudo</code></li>
+              <li>Show your sudo password prompt</li>
+              <li>Run with full root access</li>
+            </ol>
+            <p class="mb-3"><strong>Advantages:</strong></p>
+            <ul class="list-disc list-inside space-y-1 mb-4">
+              <li>✅ Simplest setup - no configuration needed</li>
+              <li>✅ Automatic - no manual setup steps</li>
+              <li>✅ Full root access for all operations</li>
+              <li>✅ No password prompts during operation</li>
+            </ul>
+            <p class="mb-3"><strong>Disadvantages:</strong></p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>⚠️ Runs as root (less secure)</li>
+              <li>⚠️ Security warning displayed in UI</li>
+              <li>⚠️ Not recommended for production</li>
+            </ul>
+            <p class="mt-4"><strong>Troubleshooting:</strong> If you have Node.js installed via NVM, Homebrew, or other version managers:</p>
+            <ol class="list-decimal list-inside space-y-2 mt-3">
+              <li><strong>Option 1</strong> - Use the bash wrapper: <code class="bg-base-300 px-1">./bin/linuxify.sh</code></li>
+              <li><strong>Option 2</strong> - Explicit PATH: <code class="bg-base-300 px-1">sudo PATH=$PATH npm run dev</code></li>
+              <li><strong>Option 3</strong> - Direct node call: <code class="bg-base-300 px-1">sudo /path/to/node npm run dev</code></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- Installation -->
     <section id="installation" class="mb-12">
@@ -428,6 +530,167 @@ Response:
             <p class="mt-2"><strong>Solution:</strong> Service is marked as critical. Check the Services tab for which are safe to disable.</p>
           </div>
         </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg text-error">Setup Wizard Not Showing</h3>
+            <p class="mt-2"><strong>Solution:</strong> Run <code class="bg-base-300 px-1">npm run dev</code> to display the wizard again.</p>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg text-error">Sudo Password Prompt Issues (Mode 1)</h3>
+            <p class="mt-2">If you're still getting password prompts in Sudoers Mode, verify the sudoers configuration:</p>
+            <pre class="bg-base-100 p-3 rounded mt-2"><code>sudo visudo -c</code></pre>
+            <p class="mt-2">And check that your user is in the <code class="bg-base-300 px-1">sudo</code> group:</p>
+            <pre class="bg-base-100 p-3 rounded"><code>groups $USER</code></pre>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg text-error">Node Not Found When Using Sudo (Mode 2)</h3>
+            <p class="mt-2">If you see "node: command not found" errors:</p>
+            <ol class="list-decimal list-inside space-y-2 mt-3">
+              <li>Try the bash wrapper: <code class="bg-base-300 px-1">./bin/linuxify.sh</code></li>
+              <li>Or use explicit PATH: <code class="bg-base-300 px-1">sudo PATH=$PATH npm run dev</code></li>
+              <li>Or find your node path: <code class="bg-base-300 px-1">which node</code> then <code class="bg-base-300 px-1">sudo /path/to/node npm run dev</code></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mode Comparison -->
+    <section id="mode-comparison" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Mode Comparison</h2>
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <table class="table table-sm w-full">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Sudoers Mode</th>
+                <th>Sudo Run Mode</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Setup Time</strong></td>
+                <td>~2 minutes</td>
+                <td>Instant</td>
+              </tr>
+              <tr>
+                <td><strong>Security</strong></td>
+                <td>Higher</td>
+                <td>Lower (runs as root)</td>
+              </tr>
+              <tr>
+                <td><strong>Password Prompts</strong></td>
+                <td>None (after setup)</td>
+                <td>None</td>
+              </tr>
+              <tr>
+                <td><strong>Multi-user Safe</strong></td>
+                <td>Yes</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><strong>Requires Configuration</strong></td>
+                <td>Yes</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><strong>Recommended</strong></td>
+                <td>✅ Yes</td>
+                <td>For testing only</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="alert alert-info mt-4">
+            <p><strong>Changing Modes:</strong> To change your operating mode, delete <code class="bg-base-300 px-1">~/.linuxify-mode</code> and run the setup wizard again.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Security Considerations -->
+    <section id="security" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Security Considerations</h2>
+      <div class="space-y-4">
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Sudoers Mode (Recommended)</h3>
+            <ul class="list-disc list-inside space-y-1 mt-3">
+              <li>✅ Runs as regular user</li>
+              <li>✅ Limited sudo scope to specific commands</li>
+              <li>✅ Audit trail in sudoers file</li>
+              <li>✅ Best for multi-user systems</li>
+              <li>✅ Original sudoers backed up automatically</li>
+            </ul>
+            <p class="mt-4">Use Sudoers Mode in production environments.</p>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Sudo Run Mode</h3>
+            <ul class="list-disc list-inside space-y-1 mt-3">
+              <li>⚠️ Runs with full root access</li>
+              <li>⚠️ No command restrictions</li>
+              <li>⚠️ Security warning banner displayed</li>
+              <li>⚠️ Best for development/testing only</li>
+            </ul>
+            <div class="alert alert-warning mt-4">
+              <p><strong>Note:</strong> A security warning banner appears in the UI when running as root.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Additional Security Features</h3>
+            <ul class="list-disc list-inside space-y-1 mt-3">
+              <li><strong>Critical Services Protection:</strong> Cannot be disabled via UI</li>
+              <li><strong>Sudoers Validation:</strong> Automatic syntax validation during setup</li>
+              <li><strong>Backup Creation:</strong> Original sudoers backed up to /etc/sudoers.bak</li>
+              <li><strong>Limited Commands:</strong> Only specific system commands are allowed</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Commands -->
+    <section id="commands" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Commands</h2>
+      <div class="card bg-base-200">
+        <div class="card-body space-y-4">
+          <div class="space-y-3">
+            <div>
+              <h4 class="font-bold text-lg"><code class="bg-base-100 px-2 py-1 rounded">npm start</code></h4>
+              <p class="text-sm">Production mode - runs the application without auto-reload</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-lg"><code class="bg-base-100 px-2 py-1 rounded">npm run dev</code></h4>
+              <p class="text-sm">Development with auto-reload (setup wizard + auto-reload with nodemon)</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-lg"><code class="bg-base-100 px-2 py-1 rounded">npm run dev -- --skip-setup</code></h4>
+              <p class="text-sm">Skip setup wizard and start directly (useful if mode is already configured)</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-lg"><code class="bg-base-100 px-2 py-1 rounded">PORT=3001 npm run dev</code></h4>
+              <p class="text-sm">Run on custom port (default is 3000)</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-lg"><code class="bg-base-100 px-2 py-1 rounded">DEBUG=* npm run dev</code></h4>
+              <p class="text-sm">Debug mode with verbose output</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -441,7 +704,11 @@ Response:
 ├── server.js              # Main Express server
 ├── package.json          # Dependencies & scripts
 ├── README.md             # Main documentation
-├── SETUP.md              # Setup guide
+├── setup.sh              # Automatic sudoers configuration
+│
+├── bin/
+│   ├── linuxify          # Interactive CLI with setup wizard
+│   └── linuxify.sh       # Bash wrapper for sudo PATH preservation
 │
 ├── modules/
 │   ├── services.js       # System service management
@@ -455,7 +722,7 @@ Response:
 │
 ├── docs/
 │   ├── index.html        # Landing page
-│   └── docs.html         # Advanced documentation
+│   └── docs.html         # Complete documentation
 │
 └── .gitignore            # Git ignore rules</code></pre>
 
@@ -468,6 +735,23 @@ Response:
             <li><strong>Update UI:</strong> Vue re-renders with new data</li>
             <li><strong>Auto-refresh:</strong> System info updates every 5 seconds</li>
           </ol>
+
+          <h3 class="card-title text-lg mt-6 mb-4">Dual-Mode Operation</h3>
+          <p class="mb-3"><strong>Sudoers Mode (Recommended):</strong></p>
+          <ul class="list-disc list-inside space-y-1 mb-4">
+            <li>User runs as regular user</li>
+            <li>App detects sudoers configuration</li>
+            <li>Calls to sudo commands execute with limited privileges</li>
+            <li>Stored preference: <code class="bg-base-300 px-1">~/.linuxify-mode</code></li>
+          </ul>
+
+          <p class="mb-3"><strong>Sudo Run Mode:</strong></p>
+          <ul class="list-disc list-inside space-y-1">
+            <li>App auto-restarts with sudo</li>
+            <li>Runs with full root privileges</li>
+            <li>UI displays security warning banner</li>
+            <li>Stored preference: <code class="bg-base-300 px-1">~/.linuxify-mode</code></li>
+          </ul>
         </div>
       </div>
     </section>
