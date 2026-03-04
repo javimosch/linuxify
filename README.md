@@ -55,8 +55,15 @@ npx linuxify
 
 #### 2. **Sudo Run Mode** (Simpler, full control)
 ```bash
-sudo npx linuxify
-# Or select option "2" when prompted for sudo-run instructions
+# If installed globally
+sudo $(which npx) linuxify
+
+# Or if in project directory
+cd linuxify
+sudo npm run cli
+
+# Or using node directly
+sudo node bin/linuxify
 ```
 - ✅ No sudoers configuration needed
 - ✅ Simplest setup (just one command with sudo)
@@ -89,25 +96,29 @@ npm run cli
 npm start
 ```
 
-## ⚙️ Sudo Configuration
+## ⚙️ Setup Modes & Sudo Configuration
 
-### Automatic Setup (Recommended)
+### Mode 1: Sudoers Mode (Recommended)
 
-When you run `npx linuxify`, the interactive setup wizard will:
+This is the traditional approach where you configure the sudoers file once, then run Linuxify as a regular user.
 
-1. Display the required sudoers rules
-2. **Automatically edit the sudoers file** (just enter your sudo password)
-3. Verify the configuration with validation
-4. Test if passwordless sudo is working
+**Automatic Setup (Recommended)**
 
-**No manual editing needed!** The wizard uses a secure bash script that:
+When you run `npx linuxify` and select sudoers mode:
+
+1. The setup wizard displays the required sudoers rules
+2. **Automatically edits the sudoers file** (just enter your sudo password)
+3. Verifies the configuration with validation
+4. Tests if passwordless sudo is working
+
+The wizard uses a secure bash script that:
 - Validates sudoers syntax before applying changes
 - Creates backups of your sudoers file
-- Uses `/etc/sudoers.d/linuxify` when available (safer approach)
+- Uses `/etc/sudoers.d/linuxify` (safer approach when available)
 - Falls back to direct editing only if needed
 - Shows clear success/error messages
 
-### Manual Setup (Alternative)
+**Manual Setup (Alternative)**
 
 If you prefer manual setup:
 
@@ -149,8 +160,6 @@ Add at the end of the file:
 %sudo ALL=(ALL) NOPASSWD: /usr/bin/find /root -name "*.old" -delete
 ```
 
-This is the same configuration that gets applied automatically by `setup.sh`.
-
 **To verify sudoers was applied correctly:**
 ```bash
 sudo -n systemctl status systemd
@@ -158,56 +167,41 @@ sudo -n systemctl status systemd
 
 If this runs without asking for a password, sudoers is configured correctly!
 
-## 🚀 Usage
+### Mode 2: Sudo Run Mode
 
-### Using npx (Easiest)
+This approach runs Linuxify directly as root with full privileges, without needing sudoers configuration.
 
-```bash
-# Run with interactive setup wizard
-npx linuxify
-
-# Skip setup and start directly
-npx linuxify --skip-setup
-
-# View all options
-npx linuxify --help
-```
-
-### Using npm scripts
+**Setup**
 
 ```bash
-# Development mode (with auto-reload)
-npm run dev
+# If installed globally
+sudo $(which npx) linuxify
 
-# Production mode
-npm start
+# Or navigate to project and run with node directly
+cd linuxify
+sudo node bin/linuxify
 
-# Run CLI with setup wizard
-npm run cli
+# Or use npm script
+sudo npm run cli
 ```
 
-Then open your browser to: **http://localhost:3000**
+**Security Considerations:**
+- ⚠️ The web interface runs as root (all operations have full system access)
+- ⚠️ Only access from localhost (127.0.0.1) - do not expose to network
+- ⚠️ Do not expose to internet or untrusted networks
+- ✅ Simpler setup - no sudoers configuration needed
+- ✅ Useful for one-time administrative tasks
+- ✅ Full control without privilege escalation concerns
 
-### CLI Options
-
-```bash
-npx linuxify [options]
-
-Options:
-  --setup, -s       Run setup wizard before starting
-  --skip-setup      Skip setup and start directly
-  --help, -h        Show help message
-  --version, -v     Show version number
-
-Examples:
-  npx linuxify                 # Interactive setup then start
-  npx linuxify --skip-setup    # Start without setup
-  npx linuxify --help          # Show this help
-```
+**When to Use:**
+- Initial system setup/optimization before users are added
+- Running as system administrator on local machine only
+- One-time cleanup/optimization tasks
+- When you want to avoid sudoers configuration complexity
 
 ### Standalone Setup Script
 
-If you only want to configure sudoers without starting the app:
+To configure sudoers without starting the app:
 
 ```bash
 sudo bash setup.sh

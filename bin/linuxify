@@ -212,10 +212,10 @@ async function setupModeSelection() {
       log('⚠ SUDO RUN MODE INSTRUCTIONS', 'yellow');
       log('='.repeat(60) + '\n', 'yellow');
       
-      log('To run Linuxify in sudo mode, use:\n', 'bright');
-      log('  sudo npx linuxify\n', 'blue');
-      log('Or if already installed locally:\n', 'blue');
-      log('  sudo npm run cli\n', 'blue');
+      log('To run Linuxify in sudo mode, use one of:\n', 'bright');
+      log('  sudo $(which npx) linuxify', 'blue');
+      log('  sudo npm run cli', 'blue');
+      log('  sudo node bin/linuxify\n', 'blue');
       
       log('Security Notes:', 'yellow');
       log('  • The web interface will run as root', 'dim');
