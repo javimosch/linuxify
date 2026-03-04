@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation - Linuxify</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet">
+</head>
+<body class="bg-base-100">
+  <div class="navbar bg-base-200 shadow-lg sticky top-0 z-50">
+    <div class="flex-1">
+      <a href="index.html" class="btn btn-ghost text-xl">Linuxify</a>
+    </div>
+    <div class="flex-none gap-2">
+      <a href="docs.html" class="btn btn-ghost btn-sm">Documentation</a>
+      <a href="https://github.com/yourusername/linuxify" class="btn btn-ghost btn-sm" target="_blank">GitHub</a>
+    </div>
+  </div>
+
+  <main class="container mx-auto max-w-4xl px-4 py-12">
+    <h1 class="text-5xl font-bold mb-8">Advanced Documentation</h1>
+
+    <!-- Table of Contents -->
+    <div class="card bg-base-200 shadow-xl mb-8">
+      <div class="card-body">
+        <h2 class="card-title">Table of Contents</h2>
+        <ul class="list-disc list-inside space-y-1">
+          <li><a href="#installation" class="link link-primary">Installation</a></li>
+          <li><a href="#configuration" class="link link-primary">Configuration</a></li>
+          <li><a href="#sudo-setup" class="link link-primary">Sudo Setup</a></li>
+          <li><a href="#services" class="link link-primary">Services Management</a></li>
+          <li><a href="#extensions" class="link link-primary">Extensions Control</a></li>
+          <li><a href="#cleanup" class="link link-primary">Disk Cleanup</a></li>
+          <li><a href="#api" class="link link-primary">API Reference</a></li>
+          <li><a href="#troubleshooting" class="link link-primary">Troubleshooting</a></li>
+          <li><a href="#architecture" class="link link-primary">Architecture</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Installation -->
+    <section id="installation" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Installation</h2>
+      <div class="space-y-4">
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Prerequisites</h3>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Linux OS (Ubuntu 20.04+, Debian 10+, AnduinOS, etc.)</li>
+              <li>Node.js 16.0.0 or higher</li>
+              <li>npm 7.0.0 or higher</li>
+              <li>sudo access (for system operations)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Steps</h3>
+            <ol class="list-decimal list-inside space-y-2 mb-4">
+              <li>Clone or extract the repository</li>
+              <li>Navigate to directory: <code class="bg-base-100 px-2 py-1 rounded">cd linuxify</code></li>
+              <li>Install dependencies: <code class="bg-base-100 px-2 py-1 rounded">npm install</code></li>
+              <li>Follow Sudo Setup below (optional but recommended)</li>
+              <li>Start the application: <code class="bg-base-100 px-2 py-1 rounded">npm run dev</code></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Configuration -->
+    <section id="configuration" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Configuration</h2>
+      <div class="card bg-base-200">
+        <div class="card-body space-y-4">
+          <h3 class="card-title text-lg">Environment Variables</h3>
+          <p>Create <code class="bg-base-100 px-2 py-1 rounded">.env</code> file (optional):</p>
+          <pre class="bg-base-100 p-4 rounded overflow-x-auto"><code>PORT=3000
+NODE_ENV=development
+REFRESH_INTERVAL=5000</code></pre>
+
+          <h3 class="card-title text-lg mt-6">server.js Customization</h3>
+          <ul class="space-y-2">
+            <li><strong>PORT:</strong> Change listening port (default: 3000)</li>
+            <li><strong>Refresh Rate:</strong> Change system update frequency</li>
+            <li><strong>Views Path:</strong> Customize template directory</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sudo Setup -->
+    <section id="sudo-setup" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Sudo Configuration</h2>
+      <div class="card bg-base-200">
+        <div class="card-body space-y-4">
+          <p class="text-warning">⚠️ Without this, you'll be prompted for sudo password for each system operation.</p>
+
+          <h3 class="card-title text-lg">Setup Steps</h3>
+          <ol class="list-decimal list-inside space-y-2 mb-4">
+            <li>Open sudoers file: <code class="bg-base-100 px-2 py-1 rounded">sudo visudo</code></li>
+            <li>Scroll to bottom of file</li>
+            <li>Add the rules below</li>
+            <li>Save with Ctrl+X, then Y, then Enter</li>
+          </ol>
+
+          <h3 class="card-title text-lg">Sudoers Rules</h3>
+          <pre class="bg-base-100 p-4 rounded overflow-x-auto text-sm"><code># Linuxify - systemctl commands
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl disable *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl stop *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl mask *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl unmask *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl enable *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl start *
+
+# Linuxify - cleanup commands
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/apt clean
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/apt autoremove -y
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/journalctl --vacuum-time=7d
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/flatpak remove --unused -y
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/apt autoremove --purge -y</code></pre>
+
+          <div class="alert alert-info mt-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>These rules only allow Linuxify commands. No general sudo access is granted.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Management -->
+    <section id="services" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Services Management</h2>
+      <div class="space-y-4">
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Overview</h3>
+            <p>Linuxify tracks and categorizes ~50+ system services into groups:</p>
+            <ul class="list-disc list-inside space-y-1 mt-3">
+              <li><strong>Critical System:</strong> systemd, dbus, NetworkManager, gdm, polkit</li>
+              <li><strong>Display & Graphics:</strong> gdm, gnome-shell, wayland</li>
+              <li><strong>Hardware:</strong> thermald, power-profiles-daemon</li>
+              <li><strong>Network:</strong> avahi-daemon, bluetooth, ModemManager</li>
+              <li><strong>Printing:</strong> cups, cups-browsed, sane</li>
+              <li><strong>Desktop:</strong> gnome-software, gnome-keyring, flatpak</li>
+              <li><strong>Background:</strong> unattended-upgrades, fwupd, packagekit</li>
+              <li><strong>Media:</strong> pipewire, pulseaudio</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Critical Services (Protected)</h3>
+            <p>Cannot be disabled via UI:</p>
+            <ul class="list-disc list-inside space-y-1 mt-3">
+              <li>systemd, systemd-journald, dbus, NetworkManager</li>
+              <li>gdm, accounts-daemon, polkit</li>
+              <li>thermald, udisks, upower</li>
+              <li>Any service matching critical patterns</li>
+            </ul>
+            <p class="text-info mt-3">🔒 These are marked with red "CRITICAL" badge and cannot be toggled.</p>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Safe to Disable</h3>
+            <table class="table table-sm w-full mt-3">
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th>Effect</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>avahi-daemon</strong></td>
+                  <td>Disables mDNS service discovery</td>
+                </tr>
+                <tr>
+                  <td><strong>bluetooth</strong></td>
+                  <td>Disables Bluetooth support</td>
+                </tr>
+                <tr>
+                  <td><strong>cups*</strong></td>
+                  <td>Disables printing</td>
+                </tr>
+                <tr>
+                  <td><strong>ModemManager</strong></td>
+                  <td>Disables mobile broadband</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Extensions Control -->
+    <section id="extensions" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Extensions Control</h2>
+      <div class="space-y-4">
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">UI Extensions (Performance Impact)</h3>
+            <p>Heavy extensions that affect system performance:</p>
+            <ul class="list-disc list-inside space-y-1 mt-3">
+              <li><strong>blur-my-shell</strong> - Blur effects (high CPU)</li>
+              <li><strong>dash-to-panel</strong> - Panel customization</li>
+              <li><strong>arcmenu</strong> - Custom app menu</li>
+              <li><strong>tiling-assistant</strong> - Window tiling</li>
+              <li><strong>openweather-extension</strong> - Weather widget</li>
+              <li><strong>mediacontrols</strong> - Media playback controls</li>
+              <li><strong>clipboard-indicator</strong> - Clipboard history</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Other Extensions (System)</h3>
+            <p>System-level extensions:</p>
+            <ul class="list-disc list-inside space-y-1 mt-3">
+              <li><strong>customize-ibus</strong> - Input method customization</li>
+              <li><strong>ubuntu-appindicators</strong> - App indicator support</li>
+              <li><strong>user-theme</strong> - Theme customization</li>
+              <li><strong>ding</strong> - Desktop icons (file manager)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Recommended</h3>
+            <div class="alert alert-success">
+              <p>✓ Keep <strong>dash-to-panel</strong> enabled unless you prefer GNOME default panel</p>
+            </div>
+            <div class="alert alert-warning">
+              <p>⚠ Disable <strong>blur-my-shell</strong> for best performance on older hardware</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Disk Cleanup -->
+    <section id="cleanup" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Disk Cleanup</h2>
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-lg mb-4">Available Cleanup Tasks</h3>
+          <table class="table table-sm w-full">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Action</th>
+                <th>Safe?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>APT Cache Clean</strong></td>
+                <td><code>sudo apt clean</code></td>
+                <td><span class="badge badge-success">Yes</span></td>
+              </tr>
+              <tr>
+                <td><strong>APT Autoremove</strong></td>
+                <td><code>sudo apt autoremove -y</code></td>
+                <td><span class="badge badge-success">Yes</span></td>
+              </tr>
+              <tr>
+                <td><strong>Clear Thumbnails</strong></td>
+                <td>Remove ~/.cache/thumbnails</td>
+                <td><span class="badge badge-success">Yes</span></td>
+              </tr>
+              <tr>
+                <td><strong>Empty Trash</strong></td>
+                <td>Remove ~/.local/share/Trash</td>
+                <td><span class="badge badge-success">Yes</span></td>
+              </tr>
+              <tr>
+                <td><strong>Clear NPM Cache</strong></td>
+                <td><code>npm cache clean --force</code></td>
+                <td><span class="badge badge-success">Yes</span></td>
+              </tr>
+              <tr>
+                <td><strong>Clear Yarn Cache</strong></td>
+                <td><code>yarn cache clean</code></td>
+                <td><span class="badge badge-success">Yes</span></td>
+              </tr>
+              <tr>
+                <td><strong>Clear Pip Cache</strong></td>
+                <td><code>pip cache purge</code></td>
+                <td><span class="badge badge-success">Yes</span></td>
+              </tr>
+              <tr>
+                <td><strong>Clear Flatpak Cache</strong></td>
+                <td><code>flatpak remove --unused -y</code></td>
+                <td><span class="badge badge-success">Yes</span></td>
+              </tr>
+              <tr>
+                <td><strong>Clean Journal Logs</strong></td>
+                <td><code>journalctl --vacuum-time=7d</code></td>
+                <td><span class="badge badge-success">Yes</span></td>
+              </tr>
+              <tr>
+                <td><strong>Remove Old Kernels</strong></td>
+                <td><code>apt autoremove --purge -y</code></td>
+                <td><span class="badge badge-warning">Caution</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="alert alert-info mt-6">
+            <p>All cleanup tasks are non-destructive and can be run multiple times safely. Disk space refreshes after each action.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- API Reference -->
+    <section id="api" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">API Reference</h2>
+      <div class="space-y-4">
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">System Info</h3>
+            <pre class="bg-base-100 p-3 rounded text-sm overflow-x-auto"><code>GET /api/system
+
+Response:
+{
+  "uptime": "2 weeks, 3 days, 5 hours",
+  "load": "0.45",
+  "memory": "2.1 / 15G",
+  "cpu": "Intel Core i5",
+  "distro": "AnduinOS 1.3.2",
+  "disk": {
+    "total": "109G",
+    "used": "39G",
+    "available": "65G",
+    "usePercent": "38%"
+  }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Toggle Service</h3>
+            <pre class="bg-base-100 p-3 rounded text-sm overflow-x-auto"><code>POST /api/service/:name
+
+Body:
+{ "action": "disable" }  // or "enable"
+
+Response:
+{ "success": true }</code></pre>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Toggle Extension</h3>
+            <pre class="bg-base-100 p-3 rounded text-sm overflow-x-auto"><code>POST /api/extension/:name
+
+Body:
+{ "action": "disable" }  // or "enable"
+
+Response:
+{ "success": true }</code></pre>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Run Cleanup</h3>
+            <pre class="bg-base-100 p-3 rounded text-sm overflow-x-auto"><code>POST /api/cleanup/:actionId
+
+IDs: apt-clean, apt-autoremove, thumbnails, trash,
+     npm-cache, yarn-cache, pip-cache, flatpak-cache,
+     journal-clean, old-kernels
+
+Response:
+{ "success": true }</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Troubleshooting -->
+    <section id="troubleshooting" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Troubleshooting</h2>
+      <div class="space-y-4">
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg text-error">sudo: no password provided</h3>
+            <p class="mt-2"><strong>Solution:</strong> Complete the Sudo Setup section above with visudo configuration.</p>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg text-error">Port 3000 already in use</h3>
+            <p class="mt-2"><strong>Solution:</strong> Kill existing process or change PORT in server.js</p>
+            <pre class="bg-base-100 p-3 rounded mt-2"><code>fuser -k 3000/tcp</code></pre>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg text-error">Extensions not showing</h3>
+            <p class="mt-2"><strong>Solution:</strong> Refresh browser cache. Some extensions install in system directories.</p>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg text-error">Disk cleanup not freeing space</h3>
+            <p class="mt-2"><strong>Solution:</strong> Run one task at a time. Some services may lock files temporarily.</p>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-lg text-error">Cannot disable service</h3>
+            <p class="mt-2"><strong>Solution:</strong> Service is marked as critical. Check the Services tab for which are safe to disable.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture -->
+    <section id="architecture" class="mb-12">
+      <h2 class="text-3xl font-bold mb-4">Architecture</h2>
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-lg mb-4">Project Structure</h3>
+          <pre class="bg-base-100 p-3 rounded text-sm overflow-x-auto"><code>linuxify/
+├── server.js              # Main Express server
+├── package.json          # Dependencies & scripts
+├── README.md             # Main documentation
+├── SETUP.md              # Setup guide
+│
+├── modules/
+│   ├── services.js       # System service management
+│   ├── extensions.js     # GNOME extension control
+│   └── system.js         # System info & cleanup tasks
+│
+├── views/
+│   └── index.ejs         # Main Vue 3 UI
+│
+├── public/               # Static assets (CSS, JS)
+│
+├── docs/
+│   ├── index.html        # Landing page
+│   └── docs.html         # Advanced documentation
+│
+└── .gitignore            # Git ignore rules</code></pre>
+
+          <h3 class="card-title text-lg mt-6 mb-4">Data Flow</h3>
+          <ol class="list-decimal list-inside space-y-2">
+            <li><strong>User Action:</strong> Click button in Vue 3 UI</li>
+            <li><strong>API Call:</strong> Fetch request to /api/* endpoints</li>
+            <li><strong>Backend:</strong> Execute system command via child_process</li>
+            <li><strong>Response:</strong> Return JSON result</li>
+            <li><strong>Update UI:</strong> Vue re-renders with new data</li>
+            <li><strong>Auto-refresh:</strong> System info updates every 5 seconds</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-16 pt-8 border-t border-base-300 text-center text-base-content/60">
+      <p>Linuxify Documentation | Author: arancibiajav@gmail.com</p>
+      <p class="text-sm mt-2">Last updated: 2024</p>
+    </footer>
+  </main>
+</body>
+</html>

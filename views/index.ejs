@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linuxify</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    .card-hover:hover { transform: translateY(-2px); }
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+    .fade-enter-from, .fade-leave-to { opacity: 0; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body class="bg-base-100 min-h-screen">
+  <div id="app">
+    <div class="navbar bg-base-200 shadow-lg sticky top-0 z-50">
+      <div class="flex-1">
+        <a class="btn btn-ghost text-xl">Linuxify</a>
+      </div>
+      <div class="flex-none text-sm">
+        <span class="mr-4">{{ systemInfo.distro }}</span>
+        <button @click="refresh" class="btn btn-square btn-ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="container mx-auto p-4">
+      <!-- System Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <div class="card bg-base-200 shadow card-hover">
+          <div class="card-body">
+            <h2 class="card-title text-sm text-base-content/60">Uptime</h2>
+            <p class="text-2xl font-mono">{{ systemInfo.uptime }}</p>
+          </div>
+        </div>
+        <div class="card bg-base-200 shadow card-hover">
+          <div class="card-body">
+            <h2 class="card-title text-sm text-base-content/60">Load Average</h2>
+            <p class="text-2xl font-mono" :class="loadClass">{{ systemInfo.load }}</p>
+          </div>
+        </div>
+        <div class="card bg-base-200 shadow card-hover">
+          <div class="card-body">
+            <h2 class="card-title text-sm text-base-content/60">Memory</h2>
+            <p class="text-2xl font-mono">{{ systemInfo.memory }}</p>
+          </div>
+        </div>
+        <div class="card bg-base-200 shadow card-hover">
+          <div class="card-body">
+            <h2 class="card-title text-sm text-base-content/60">CPU</h2>
+            <p class="text-lg font-mono break-all">{{ systemInfo.cpu }}</p>
+          </div>
+        </div>
+        <div class="card bg-base-200 shadow card-hover">
+          <div class="card-body">
+            <h2 class="card-title text-sm text-base-content/60">Disk</h2>
+            <p class="text-2xl font-mono">{{ systemInfo.disk.available }} free</p>
+            <p class="text-xs text-base-content/60">{{ systemInfo.disk.used }} / {{ systemInfo.disk.total }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Tabbed Content -->
+      <div class="card bg-base-200 shadow-xl">
+        <div class="card-body">
+          <div class="tabs tabs-bordered mb-6" role="tablist">
+            <a 
+              role="tab" 
+              class="tab" 
+              :class="activeTab === 'services' ? 'tab-active' : ''" 
+              @click="activeTab = 'services'"
+            >
+              Services
+              <span class="badge badge-sm ml-2">{{ services.filter(s => s.active && !s.critical).length }}/{{ services.filter(s => !s.critical).length }}</span>
+            </a>
+            <a 
+              role="tab" 
+              class="tab" 
+              :class="activeTab === 'extensions' ? 'tab-active' : ''" 
+              @click="activeTab = 'extensions'"
+            >
+              Extensions
+              <span class="badge badge-sm ml-2">{{ (extensions.ui?.filter(e => e.enabled).length || 0) + (extensions.other?.filter(e => e.enabled).length || 0) }}</span>
+            </a>
+            <a 
+              role="tab" 
+              class="tab" 
+              :class="activeTab === 'cleanup' ? 'tab-active' : ''" 
+              @click="activeTab = 'cleanup'"
+            >
+              Disk Cleanup
+              <span class="badge badge-info badge-sm ml-2">{{ systemInfo.disk.available }}</span>
+            </a>
+            <a 
+              role="tab" 
+              class="tab" 
+              :class="activeTab === 'actions' ? 'tab-active' : ''" 
+              @click="activeTab = 'actions'"
+            >
+              Quick Actions
+            </a>
+          </div>
+
+          <!-- Services Tab -->
+          <div class="tab-content" :class="{ active: activeTab === 'services' }">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2" />
+              </svg>
+              System Services
+              <span class="badge badge-success badge-sm">{{ services.filter(s => s.active && !s.critical).length }} running</span>
+              <span class="badge badge-error badge-sm">{{ services.filter(s => s.critical).length }} critical</span>
+            </h3>
+            <div class="tabs tabs-boxed mb-4">
+              <a class="tab" :class="serviceFilter === 'optimizable' ? 'tab-active' : ''" @click="serviceFilter = 'optimizable'">Optimizable</a>
+              <a class="tab" :class="serviceFilter === 'all' ? 'tab-active' : ''" @click="serviceFilter = 'all'">All Services</a>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="table table-zebra">
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="svc in filteredServices" :key="svc.name" :class="svc.critical ? 'bg-error/10' : ''">
+                    <td class="font-mono text-sm">
+                      <span v-if="svc.critical" class="badge badge-error badge-xs mr-1">CRITICAL</span>
+                      {{ svc.name }}
+                    </td>
+                    <td>
+                      <span class="badge" :class="svc.active ? 'badge-success' : 'badge-ghost'">
+                        {{ svc.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <button 
+                        @click="toggleService(svc)" 
+                        class="btn btn-xs"
+                        :class="[svc.critical ? 'btn-disabled cursor-not-allowed' : (svc.active ? 'btn-error' : 'btn-success')]"
+                        :disabled="loading[svc.name] || svc.critical"
+                        :title="svc.critical ? 'Cannot disable critical service' : ''"
+                      >
+                        <span v-if="loading[svc.name]" class="loading loading-spinner loading-xs"></span>
+                        {{ svc.active ? 'Disable' : 'Enable' }}
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Extensions Tab -->
+          <div class="tab-content" :class="{ active: activeTab === 'extensions' }">
+            <div class="space-y-6">
+              <!-- UI Extensions -->
+              <div>
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                  UI Extensions
+                  <span class="badge badge-secondary badge-sm">{{ extensions.ui?.filter(e => e.enabled).length || 0 }} enabled</span>
+                </h3>
+                <div class="overflow-x-auto">
+                  <table class="table table-zebra">
+                    <thead>
+                      <tr>
+                        <th>Extension</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="ext in extensions.ui" :key="ext.name">
+                        <td class="font-mono text-sm">{{ ext.name.split('@')[0] }}</td>
+                        <td>
+                          <span class="badge" :class="ext.enabled ? 'badge-success' : 'badge-ghost'">
+                            {{ ext.enabled ? 'enabled' : 'disabled' }}
+                          </span>
+                        </td>
+                        <td>
+                          <button 
+                            @click="toggleExtension(ext)" 
+                            class="btn btn-xs"
+                            :class="ext.enabled ? 'btn-warning' : 'btn-info'"
+                            :disabled="loading[ext.name]"
+                          >
+                            <span v-if="loading[ext.name]" class="loading loading-spinner loading-xs"></span>
+                            {{ ext.enabled ? 'Disable' : 'Enable' }}
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Other Extensions -->
+              <div>
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  Other Extensions
+                  <span class="badge badge-accent badge-sm">{{ extensions.other?.filter(e => e.enabled).length || 0 }} enabled</span>
+                </h3>
+                <div class="overflow-x-auto">
+                  <table class="table table-zebra">
+                    <thead>
+                      <tr>
+                        <th>Extension</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="ext in extensions.other" :key="ext.name">
+                        <td class="font-mono text-sm">{{ ext.name.split('@')[0] }}</td>
+                        <td>
+                          <span class="badge" :class="ext.enabled ? 'badge-success' : 'badge-ghost'">
+                            {{ ext.enabled ? 'enabled' : 'disabled' }}
+                          </span>
+                        </td>
+                        <td>
+                          <button 
+                            @click="toggleExtension(ext)" 
+                            class="btn btn-xs"
+                            :class="ext.enabled ? 'btn-warning' : 'btn-info'"
+                            :disabled="loading[ext.name]"
+                          >
+                            <span v-if="loading[ext.name]" class="loading loading-spinner loading-xs"></span>
+                            {{ ext.enabled ? 'Disable' : 'Enable' }}
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Disk Cleanup Tab -->
+          <div class="tab-content" :class="{ active: activeTab === 'cleanup' }">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+              Disk Cleanup
+              <span class="badge badge-info badge-sm">Free: {{ systemInfo.disk.available }}</span>
+            </h3>
+            <p class="text-sm text-base-content/60 mb-6">Non-critical cleanup tasks. Disk space will refresh after each action.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <button 
+                v-for="action in cleanupActions" 
+                :key="action.id"
+                @click="runCleanup(action)" 
+                class="btn btn-outline btn-sm justify-start"
+                :disabled="cleanupLoading[action.id]"
+              >
+                <span v-if="cleanupLoading[action.id]" class="loading loading-spinner loading-sm"></span>
+                {{ action.name }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Actions Tab -->
+          <div class="tab-content" :class="{ active: activeTab === 'actions' }">
+            <h3 class="text-lg font-bold mb-6">Quick Actions</h3>
+            <div class="space-y-4">
+              <div class="alert alert-info">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>Use tabs above to manage services, extensions, and cleanup tasks.</span>
+              </div>
+              <div class="divider"></div>
+              <button @click="disableAllExtensions" class="btn btn-warning w-full justify-start" :disabled="loadingAll">
+                <span v-if="loadingAll" class="loading loading-spinner"></span>
+                Disable All UI Extensions (Keep Dash-to-Panel)
+              </button>
+              <button @click="refresh" class="btn btn-outline w-full">
+                Force Refresh All Data
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        const systemInfo = ref(<%- JSON.stringify(systemInfo) %>);
+        const services = ref(<%- JSON.stringify(services) %>);
+        const extensions = ref(<%- JSON.stringify(extensions) %>);
+        const loading = ref({});
+        const loadingAll = ref(false);
+        const cleanupLoading = ref({});
+        const activeTab = ref('services');
+        const serviceFilter = ref('optimizable');
+        const cleanupActions = ref(<%- JSON.stringify(cleanupActions) %>);
+
+        const filteredServices = computed(() => {
+          if (serviceFilter.value === 'all') return services.value;
+          return services.value.filter(s => !s.critical);
+        });
+
+        const loadClass = computed(() => {
+          const load = parseFloat(systemInfo.value.load);
+          if (load < 0.5) return 'text-success';
+          if (load < 1.0) return 'text-warning';
+          return 'text-error';
+        });
+
+        const refresh = async () => {
+          const res = await fetch('/api/system');
+          systemInfo.value = await res.json();
+        };
+
+        const toggleService = async (svc) => {
+          if (svc.critical) return;
+          loading.value[svc.name] = true;
+          const action = svc.active ? 'disable' : 'enable';
+          const res = await fetch(`/api/service/${svc.name}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action })
+          });
+          const result = await res.json();
+          if (result.success) {
+            svc.active = !svc.active;
+            svc.status = svc.active ? 'active' : 'disabled';
+          }
+          loading.value[svc.name] = false;
+        };
+
+        const toggleExtension = async (ext) => {
+          loading.value[ext.name] = true;
+          const action = ext.enabled ? 'disable' : 'enable';
+          await fetch(`/api/extension/${ext.name}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action })
+          });
+          ext.enabled = !ext.enabled;
+          loading.value[ext.name] = false;
+        };
+
+        const disableAllExtensions = async () => {
+          loadingAll.value = true;
+          for (const ext of extensions.value.ui) {
+            if (ext.enabled && !ext.name.includes('dash-to-panel')) {
+              await toggleExtension(ext);
+            }
+          }
+          loadingAll.value = false;
+        };
+
+        const runCleanup = async (action) => {
+          cleanupLoading.value[action.id] = true;
+          try {
+            const res = await fetch(`/api/cleanup/${action.id}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await res.json();
+            if (result.success) {
+              setTimeout(() => refresh(), 1000);
+            }
+          } catch (e) {}
+          cleanupLoading.value[action.id] = false;
+        };
+
+        onMounted(() => {
+          setInterval(refresh, 5000);
+        });
+
+        return {
+          systemInfo,
+          services,
+          extensions,
+          loading,
+          loadingAll,
+          cleanupLoading,
+          activeTab,
+          serviceFilter,
+          filteredServices,
+          loadClass,
+          refresh,
+          toggleService,
+          toggleExtension,
+          disableAllExtensions,
+          cleanupActions,
+          runCleanup
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

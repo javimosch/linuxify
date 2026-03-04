@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linuxify - Linux System Optimizer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet">
+  <style>
+    .hero-gradient {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+  </style>
+</head>
+<body class="bg-base-100">
+  <div class="navbar bg-base-200 shadow-lg sticky top-0 z-50">
+    <div class="flex-1">
+      <a href="index.html" class="btn btn-ghost text-xl">Linuxify</a>
+    </div>
+    <div class="flex-none gap-2">
+      <a href="docs.html" class="btn btn-ghost btn-sm">Documentation</a>
+      <a href="https://github.com/yourusername/linuxify" class="btn btn-ghost btn-sm" target="_blank">GitHub</a>
+    </div>
+  </div>
+
+  <main>
+    <!-- Hero Section -->
+    <div class="hero hero-gradient min-h-screen">
+      <div class="hero-content text-center text-neutral-content">
+        <div class="max-w-md">
+          <h1 class="mb-5 text-5xl font-bold">Linuxify</h1>
+          <p class="mb-5 text-lg">Lightweight Linux system optimizer with a beautiful web interface. Manage services, extensions, and disk space with ease.</p>
+          <a href="docs.html" class="btn btn-primary mb-4">Get Started</a>
+          <a href="https://github.com/yourusername/linuxify" class="btn btn-outline btn-primary ml-2" target="_blank">View on GitHub</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="py-16 px-4">
+      <div class="container mx-auto max-w-6xl">
+        <h2 class="text-4xl font-bold text-center mb-12">Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Service Management
+              </h2>
+              <p>Enable/disable non-critical system services safely. Critical services are protected.</p>
+            </div>
+          </div>
+
+          <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                </svg>
+                Extension Control
+              </h2>
+              <p>Manage GNOME shell extensions - UI effects and system extensions in one place.</p>
+            </div>
+          </div>
+
+          <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+                Disk Cleanup
+              </h2>
+              <p>10 one-click cleanup tasks. Clear caches, logs, trash safely.</p>
+            </div>
+          </div>
+
+          <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Real-time Monitoring
+              </h2>
+              <p>Live system stats - uptime, load, memory, CPU, disk space auto-updating.</p>
+            </div>
+          </div>
+
+          <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                </svg>
+                Safety First
+              </h2>
+              <p>Critical services protected. All cleanup tasks are non-destructive and safe.</p>
+            </div>
+          </div>
+
+          <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                </svg>
+                Beautiful UI
+              </h2>
+              <p>Modern web interface with tabbed navigation. Responsive design works on all devices.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Start Section -->
+    <section class="py-16 px-4 bg-base-200">
+      <div class="container mx-auto max-w-3xl">
+        <h2 class="text-4xl font-bold text-center mb-12">Quick Start</h2>
+        <div class="space-y-4">
+          <div class="step step-primary">
+            <div class="step-content">
+              <p class="step-title">Install</p>
+              <code class="code-block bg-base-100 p-2 rounded">npm install</code>
+            </div>
+          </div>
+          <div class="step step-primary">
+            <div class="step-content">
+              <p class="step-title">Configure Sudo</p>
+              <p class="text-sm">Optional: Run <code>sudo visudo</code> to allow passwordless commands</p>
+            </div>
+          </div>
+          <div class="step step-primary">
+            <div class="step-content">
+              <p class="step-title">Start</p>
+              <code class="code-block bg-base-100 p-2 rounded">npm run dev</code>
+            </div>
+          </div>
+          <div class="step step-primary">
+            <div class="step-content">
+              <p class="step-title">Open</p>
+              <code class="code-block bg-base-100 p-2 rounded">http://localhost:3000</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section class="py-16 px-4">
+      <div class="container mx-auto max-w-4xl">
+        <h2 class="text-4xl font-bold text-center mb-12">Tech Stack</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-2xl font-bold mb-4">Backend</h3>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                Node.js + Express
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                EJS Templates
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                Nodemon (Dev)
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold mb-4">Frontend</h3>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                Vue 3 (CDN)
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                Tailwind CSS + DaisyUI
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                Responsive Design
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer bg-base-200 text-base-content p-10">
+      <aside>
+        <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 20 20"><path d="M10 3a7 7 0 100 14 7 7 0 000-14z"></path></svg>
+        <p>Linuxify - Keep your Linux optimized, one click at a time.</p>
+      </aside>
+      <nav>
+        <h6 class="footer-title">Links</h6>
+        <a href="https://github.com/yourusername/linuxify" class="link link-hover" target="_blank">GitHub</a>
+        <a href="docs.html" class="link link-hover">Documentation</a>
+        <a href="#" class="link link-hover">Issues</a>
+      </nav>
+      <nav>
+        <h6 class="footer-title">Legal</h6>
+        <a href="#" class="link link-hover">License</a>
+        <a href="#" class="link link-hover">Privacy</a>
+        <a href="#" class="link link-hover">Terms</a>
+      </nav>
+    </footer>
+  </main>
+</body>
+</html>
