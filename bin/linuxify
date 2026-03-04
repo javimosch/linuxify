@@ -85,8 +85,8 @@ async function setupSudoers() {
     }
   }
 
-  log('\nYou need to add the following lines to your sudoers file:', 'yellow');
-  log('\n' + '-'.repeat(60), 'dim');
+  log('\nRequired sudoers rules for Linuxify:\n', 'yellow');
+  log('-'.repeat(60), 'dim');
 
   const sudoersRules = `# Linuxify - systemctl commands
 %sudo ALL=(ALL) NOPASSWD: /bin/systemctl disable *
@@ -110,44 +110,64 @@ async function setupSudoers() {
 %sudo ALL=(ALL) NOPASSWD: /usr/bin/rm -rf /tmp/*
 %sudo ALL=(ALL) NOPASSWD: /usr/bin/rm -rf /var/tmp/*
 %sudo ALL=(ALL) NOPASSWD: /usr/bin/rm -rf /root/.cache
-%sudo ALL=(ALL) NOPASSWD: /usr/bin/find /root -name "*.old" -delete`;
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/find /root -name "\.old" -delete`;
 
   console.log(sudoersRules);
   log('-'.repeat(60) + '\n', 'dim');
 
-  log('To apply these rules:', 'bright');
-  log('1. Run: sudo visudo', 'blue');
-  log('2. Scroll to the end of the file', 'blue');
-  log('3. Paste the above lines', 'blue');
-  log('4. Press Ctrl+X, then Y, then Enter (if using nano)', 'blue');
-  log('5. Or if using vi: press Escape, :wq, then Enter\n', 'blue');
-
-  const configure = await prompt('Would you like me to open sudoers now? (y/n)');
+  log('This will be added to your sudoers file automatically.', 'yellow');
+  const configure = await prompt('Configure sudoers automatically? (y/n)');
   
   if (configure === 'y') {
-    log('\nOpening sudoers editor...', 'green');
-    const result = spawnSync('sudo', ['visudo'], { stdio: 'inherit' });
+    log('\n' + '='.repeat(60), 'bright');
+    log('RUNNING SUDOERS CONFIGURATION', 'bright');
+    log('='.repeat(60) + '\n', 'bright');
+    
+    log('You will be prompted for your sudo password...', 'yellow');
+    log('(This is required to edit the sudoers file securely)\n', 'yellow');
+    
+    // Get the path to setup.sh
+    const setupScriptPath = path.join(__dirname, '..', 'setup.sh');
+    
+    // Run the setup script with sudo
+    const result = spawnSync('sudo', ['bash', setupScriptPath], { 
+      stdio: 'inherit',
+      timeout: 60000 // 60 second timeout
+    });
     
     if (result.status === 0) {
       log('\n✓ Sudoers configured successfully!', 'green');
       
       // Test the configuration
-      log('Testing sudoers configuration...', 'yellow');
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait a moment for changes to take effect
+      
+      log('Verifying sudoers configuration...', 'yellow');
       if (checkSudoersRules()) {
-        log('✓ Sudo configuration verified!', 'green');
+        log('✓ Configuration verified - passwordless sudo is working!', 'green');
         return true;
       } else {
-        log('⚠ Sudo configuration test inconclusive (may still work)', 'yellow');
+        log('⚠ Configuration may be working but verification test inconclusive', 'yellow');
+        log('This is normal - the configuration should still work.\n', 'yellow');
         return true;
       }
+    } else if (result.status === 1) {
+      log('\n✗ Setup script reported an error', 'red');
+      log('Please review the error messages above\n', 'yellow');
+      return false;
+    } else if (result.signal === 'SIGTERM') {
+      log('\n✗ Setup script timed out', 'red');
+      log('Please try again or configure manually\n', 'yellow');
+      return false;
     } else {
-      log('\n✗ Sudoers configuration cancelled', 'red');
-      log('You can configure it manually later by running: sudo visudo\n', 'yellow');
+      log('\n✗ Sudoers configuration was cancelled or failed', 'red');
+      log('You can configure it manually later by running: sudo bash setup.sh\n', 'yellow');
       return false;
     }
   } else {
-    log('\nYou can configure sudoers manually later by running: sudo visudo', 'yellow');
-    log('Copy the rules shown above into your sudoers file.\n', 'yellow');
+    log('\nYou can configure sudoers manually later by running:', 'yellow');
+    log('  sudo bash setup.sh\n', 'blue');
+    log('Or for interactive sudoers editing:', 'yellow');
+    log('  sudo visudo\n', 'blue');
     return true;
   }
 }

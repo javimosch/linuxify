@@ -56,13 +56,31 @@ npm start
 
 ## ⚙️ Sudo Configuration
 
-Linuxify can automatically configure sudoers for you! When you run `npx linuxify`, the interactive wizard will offer to:
+### Automatic Setup (Recommended)
+
+When you run `npx linuxify`, the interactive setup wizard will:
 
 1. Display the required sudoers rules
-2. Open `sudo visudo` automatically
-3. Verify the configuration
+2. **Automatically edit the sudoers file** (just enter your sudo password)
+3. Verify the configuration with validation
+4. Test if passwordless sudo is working
 
-**Manual Setup** (if needed):
+**No manual editing needed!** The wizard uses a secure bash script that:
+- Validates sudoers syntax before applying changes
+- Creates backups of your sudoers file
+- Uses `/etc/sudoers.d/linuxify` when available (safer approach)
+- Falls back to direct editing only if needed
+- Shows clear success/error messages
+
+### Manual Setup (Alternative)
+
+If you prefer manual setup:
+
+```bash
+sudo bash setup.sh
+```
+
+Or for interactive sudoers editing:
 
 ```bash
 sudo visudo
@@ -96,7 +114,14 @@ Add at the end of the file:
 %sudo ALL=(ALL) NOPASSWD: /usr/bin/find /root -name "*.old" -delete
 ```
 
-Save with `Ctrl+X`, then `Y`, then `Enter` (nano) or `:wq` (vi).
+This is the same configuration that gets applied automatically by `setup.sh`.
+
+**To verify sudoers was applied correctly:**
+```bash
+sudo -n systemctl status systemd
+```
+
+If this runs without asking for a password, sudoers is configured correctly!
 
 ## 🚀 Usage
 
@@ -144,6 +169,22 @@ Examples:
   npx linuxify --skip-setup    # Start without setup
   npx linuxify --help          # Show this help
 ```
+
+### Standalone Setup Script
+
+If you only want to configure sudoers without starting the app:
+
+```bash
+sudo bash setup.sh
+```
+
+This script:
+- ✓ Validates sudoers syntax before applying
+- ✓ Creates automatic backups
+- ✓ Prefers `/etc/sudoers.d/linuxify` for safer configuration
+- ✓ Verifies the final configuration
+- ✓ Shows clear success/error messages
+- ✓ Handles both systemctl and cleanup commands
 
 ## 📊 Tabs Overview
 
