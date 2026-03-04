@@ -25,17 +25,44 @@
 
 ## 🔧 Installation
 
+### Quick Start (Recommended)
+
+The easiest way to get started with Linuxify is using `npx`:
+
+```bash
+npx linuxify
+```
+
+This will:
+1. Show an interactive setup wizard
+2. Optionally configure sudoers for passwordless commands
+3. Start the application automatically
+
+### Manual Installation
+
 ```bash
 # Clone or navigate to project
 cd linuxify
 
 # Install dependencies
 npm install
+
+# Start with setup wizard
+npm run cli
+
+# Or start directly (skip setup)
+npm start
 ```
 
-## ⚙️ Sudo Configuration (Optional but Recommended)
+## ⚙️ Sudo Configuration
 
-To avoid password prompts during system operations:
+Linuxify can automatically configure sudoers for you! When you run `npx linuxify`, the interactive wizard will offer to:
+
+1. Display the required sudoers rules
+2. Open `sudo visudo` automatically
+3. Verify the configuration
+
+**Manual Setup** (if needed):
 
 ```bash
 sudo visudo
@@ -51,30 +78,72 @@ Add at the end of the file:
 %sudo ALL=(ALL) NOPASSWD: /bin/systemctl unmask *
 %sudo ALL=(ALL) NOPASSWD: /bin/systemctl enable *
 %sudo ALL=(ALL) NOPASSWD: /bin/systemctl start *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl restart *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl reload *
 
 # Linuxify - cleanup commands
 %sudo ALL=(ALL) NOPASSWD: /usr/bin/apt clean
 %sudo ALL=(ALL) NOPASSWD: /usr/bin/apt autoremove -y
-%sudo ALL=(ALL) NOPASSWD: /usr/bin/journalctl --vacuum-time=7d
-%sudo ALL=(ALL) NOPASSWD: /usr/bin/flatpak remove --unused -y
 %sudo ALL=(ALL) NOPASSWD: /usr/bin/apt autoremove --purge -y
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/journalctl --vacuum-time=7d
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/journalctl --vacuum-size=500M
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/flatpak remove --unused -y
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/dnf clean all
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/pacman -Sc --noconfirm
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/rm -rf /tmp/*
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/rm -rf /var/tmp/*
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/rm -rf /root/.cache
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/find /root -name "*.old" -delete
 ```
 
-Save with `Ctrl+X`, then `Y`, then `Enter`.
+Save with `Ctrl+X`, then `Y`, then `Enter` (nano) or `:wq` (vi).
 
 ## 🚀 Usage
 
-**Development mode** (with auto-reload):
+### Using npx (Easiest)
+
 ```bash
+# Run with interactive setup wizard
+npx linuxify
+
+# Skip setup and start directly
+npx linuxify --skip-setup
+
+# View all options
+npx linuxify --help
+```
+
+### Using npm scripts
+
+```bash
+# Development mode (with auto-reload)
 npm run dev
-```
 
-**Production mode**:
-```bash
+# Production mode
 npm start
+
+# Run CLI with setup wizard
+npm run cli
 ```
 
-Then open: **http://localhost:3000**
+Then open your browser to: **http://localhost:3000**
+
+### CLI Options
+
+```bash
+npx linuxify [options]
+
+Options:
+  --setup, -s       Run setup wizard before starting
+  --skip-setup      Skip setup and start directly
+  --help, -h        Show help message
+  --version, -v     Show version number
+
+Examples:
+  npx linuxify                 # Interactive setup then start
+  npx linuxify --skip-setup    # Start without setup
+  npx linuxify --help          # Show this help
+```
 
 ## 📊 Tabs Overview
 

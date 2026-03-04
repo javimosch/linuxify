@@ -1,0 +1,259 @@
+#!/usr/bin/env node
+
+/**
+ * Linuxify CLI Entry Point
+ * Handles interactive setup and starts the application
+ */
+
+const path = require('path');
+const fs = require('fs');
+const { spawnSync } = require('child_process');
+const readline = require('readline');
+
+// Color codes for terminal output
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  red: '\x1b[31m',
+  blue: '\x1b[36m',
+  dim: '\x1b[2m'
+};
+
+// Create readline interface
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+// Helper functions
+function log(message, color = 'reset') {
+  console.log(`${colors[color]}${message}${colors.reset}`);
+}
+
+function prompt(question) {
+  return new Promise((resolve) => {
+    rl.question(`${colors.blue}?${colors.reset} ${question} `, (answer) => {
+      resolve(answer.toLowerCase().trim());
+    });
+  });
+}
+
+function isRunningAsRoot() {
+  return process.getuid?.() === 0;
+}
+
+function isSudoersConfigured() {
+  try {
+    const result = spawnSync('sudo', ['-n', 'true'], {
+      stdio: 'pipe',
+      timeout: 2000
+    });
+    return result.status === 0;
+  } catch {
+    return false;
+  }
+}
+
+function checkSudoersRules() {
+  try {
+    // Try running a test command with sudo without password
+    const result = spawnSync('sudo', ['-n', 'systemctl', 'status', 'systemd'], {
+      stdio: 'pipe',
+      timeout: 2000
+    });
+    return result.status === 0;
+  } catch {
+    return false;
+  }
+}
+
+async function setupSudoers() {
+  log('\n' + '='.repeat(60), 'bright');
+  log('SUDOERS CONFIGURATION SETUP', 'bright');
+  log('='.repeat(60) + '\n', 'bright');
+
+  log('Linuxify needs sudo access to manage system services and disk cleanup.', 'yellow');
+  log('This setup will configure passwordless sudo for specific commands.\n', 'yellow');
+
+  if (isSudoersConfigured()) {
+    log('✓ Your system appears to already allow passwordless sudo', 'green');
+    const proceed = await prompt('Reconfigure sudoers rules? (y/n)');
+    if (proceed !== 'y') {
+      return true;
+    }
+  }
+
+  log('\nYou need to add the following lines to your sudoers file:', 'yellow');
+  log('\n' + '-'.repeat(60), 'dim');
+
+  const sudoersRules = `# Linuxify - systemctl commands
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl disable *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl stop *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl mask *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl unmask *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl enable *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl start *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl restart *
+%sudo ALL=(ALL) NOPASSWD: /bin/systemctl reload *
+
+# Linuxify - cleanup commands
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/apt clean
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/apt autoremove -y
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/apt autoremove --purge -y
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/journalctl --vacuum-time=7d
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/journalctl --vacuum-size=500M
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/flatpak remove --unused -y
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/dnf clean all
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/pacman -Sc --noconfirm
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/rm -rf /tmp/*
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/rm -rf /var/tmp/*
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/rm -rf /root/.cache
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/find /root -name "*.old" -delete`;
+
+  console.log(sudoersRules);
+  log('-'.repeat(60) + '\n', 'dim');
+
+  log('To apply these rules:', 'bright');
+  log('1. Run: sudo visudo', 'blue');
+  log('2. Scroll to the end of the file', 'blue');
+  log('3. Paste the above lines', 'blue');
+  log('4. Press Ctrl+X, then Y, then Enter (if using nano)', 'blue');
+  log('5. Or if using vi: press Escape, :wq, then Enter\n', 'blue');
+
+  const configure = await prompt('Would you like me to open sudoers now? (y/n)');
+  
+  if (configure === 'y') {
+    log('\nOpening sudoers editor...', 'green');
+    const result = spawnSync('sudo', ['visudo'], { stdio: 'inherit' });
+    
+    if (result.status === 0) {
+      log('\n✓ Sudoers configured successfully!', 'green');
+      
+      // Test the configuration
+      log('Testing sudoers configuration...', 'yellow');
+      if (checkSudoersRules()) {
+        log('✓ Sudo configuration verified!', 'green');
+        return true;
+      } else {
+        log('⚠ Sudo configuration test inconclusive (may still work)', 'yellow');
+        return true;
+      }
+    } else {
+      log('\n✗ Sudoers configuration cancelled', 'red');
+      log('You can configure it manually later by running: sudo visudo\n', 'yellow');
+      return false;
+    }
+  } else {
+    log('\nYou can configure sudoers manually later by running: sudo visudo', 'yellow');
+    log('Copy the rules shown above into your sudoers file.\n', 'yellow');
+    return true;
+  }
+}
+
+async function runSetupWizard() {
+  log('\n' + '╔' + '═'.repeat(58) + '╗', 'bright');
+  log('║' + ' '.repeat(58) + '║', 'bright');
+  log('║' + '  Welcome to Linuxify - Linux System Optimizer'.padEnd(57) + '║', 'bright');
+  log('║' + ' '.repeat(58) + '║', 'bright');
+  log('╚' + '═'.repeat(58) + '╝\n', 'bright');
+
+  const skipSetup = await prompt('Run setup wizard? (y/n)');
+  
+  if (skipSetup !== 'y') {
+    log('\nSkipping setup. You can run it anytime with: npx linuxify --setup\n', 'yellow');
+    return true;
+  }
+
+  // Check if we're in the right directory
+  const serverPath = path.join(process.cwd(), 'server.js');
+  if (!fs.existsSync(serverPath)) {
+    log('\n✗ Error: server.js not found in current directory', 'red');
+    log('Make sure you\'re in the Linuxify project directory\n', 'yellow');
+    process.exit(1);
+  }
+
+  // Run sudoers setup
+  const sudoersSuccess = await setupSudoers();
+  if (!sudoersSuccess) {
+    const cont = await prompt('Continue without sudoers configuration? (y/n)');
+    if (cont !== 'y') {
+      rl.close();
+      process.exit(0);
+    }
+  }
+
+  log('\n✓ Setup complete! Starting Linuxify...\n', 'green');
+  return true;
+}
+
+async function main() {
+  // Parse command line arguments
+  const args = process.argv.slice(2);
+  
+  // Check for help flag
+  if (args.includes('--help') || args.includes('-h')) {
+    log('\n' + '═'.repeat(60), 'bright');
+    log('Linuxify - Linux System Optimizer', 'bright');
+    log('═'.repeat(60) + '\n', 'bright');
+    
+    log('Usage: linuxify [options]\n', 'bright');
+    
+    log('Options:', 'bright');
+    log('  --setup, -s       Run setup wizard before starting', 'blue');
+    log('  --skip-setup      Skip setup and start directly', 'blue');
+    log('  --help, -h        Show this help message', 'blue');
+    log('  --version, -v     Show version\n', 'blue');
+    
+    log('Examples:', 'bright');
+    log('  npx linuxify              # Interactive setup then start', 'dim');
+    log('  npx linuxify --skip-setup # Start without setup', 'dim');
+    log('  npx linuxify --setup      # Run setup wizard only\n', 'dim');
+    
+    rl.close();
+    process.exit(0);
+  }
+
+  // Check for version flag
+  if (args.includes('--version') || args.includes('-v')) {
+    const packageJson = require(path.join(__dirname, '..', 'package.json'));
+    log(`Linuxify v${packageJson.version}\n`, 'green');
+    rl.close();
+    process.exit(0);
+  }
+
+  // Check for skip-setup flag
+  const skipSetup = args.includes('--skip-setup');
+
+  // Run setup wizard if not skipped
+  if (!skipSetup) {
+    await runSetupWizard();
+  } else {
+    log('\nStarting Linuxify...\n', 'green');
+  }
+
+  // Start the server
+  rl.close();
+  
+  try {
+    require(path.join(__dirname, '..', 'server.js'));
+  } catch (error) {
+    log(`\n✗ Error starting server: ${error.message}`, 'red');
+    process.exit(1);
+  }
+}
+
+// Handle Ctrl+C gracefully
+process.on('SIGINT', () => {
+  log('\n\nGoodbye!', 'yellow');
+  rl.close();
+  process.exit(0);
+});
+
+// Run main function
+main().catch((error) => {
+  log(`\n✗ Fatal error: ${error.message}`, 'red');
+  rl.close();
+  process.exit(1);
+});
