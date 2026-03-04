@@ -55,19 +55,19 @@ npx linuxify
 
 #### 2. **Sudo Run Mode** (Simpler, full control)
 
-**If installed globally via npx:**
-```bash
-# Get the full path to npx and use it with sudo
-sudo $(which npx) linuxify
-```
-
-**From the project directory:**
+**From the project directory (Recommended):**
 ```bash
 cd linuxify
-sudo -E npm run cli
+sudo bash bin/linuxify.sh
 ```
 
-The `-E` flag preserves your user's environment (including PATH to find npm).
+**If installed globally:**
+```bash
+# Get the full path to the wrapper script
+sudo $(which linuxify.sh)
+```
+
+The `linuxify.sh` wrapper script preserves your environment (including PATH) so it can properly locate Node.js, even when running with sudo.
 - ✅ No sudoers configuration needed
 - ✅ Simplest setup (just one command with sudo)
 - ✅ Full root privileges, complete control
@@ -177,18 +177,17 @@ This approach runs Linuxify directly as root with full privileges, without needi
 **Setup**
 
 ```bash
-# Get the full path to npx and use it with sudo
-sudo $(which npx) linuxify
-```
-
-Or from the project directory:
-
-```bash
 cd linuxify
-sudo -E npm run cli
+sudo bash bin/linuxify.sh
 ```
 
-Note: The `-E` flag preserves your environment's PATH so sudo can find npm. If using NVM or other Node version managers, this is necessary.
+The `linuxify.sh` wrapper script handles the sudo environment properly, preserving PATH and other necessary variables so Node.js can be located and executed.
+
+**Why the wrapper script?**
+- sudo strips the PATH by default for security
+- Direct `node`, `npm`, `npx` commands fail with "command not found"
+- The bash wrapper finds and uses the user's node executable
+- Works with NVM, Homebrew, system Node, and other installations
 
 **Security Considerations:**
 - ⚠️ The web interface runs as root (all operations have full system access)
