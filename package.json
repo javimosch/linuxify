@@ -19,10 +19,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/linuxify"
+    "url": "https://github.com/javimosch/linuxify"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/linuxify/issues"
+    "url": "https://github.com/javimosch/linuxify/issues"
   },
-  "homepage": "https://github.com/yourusername/linuxify#readme"
+  "homepage": "https://github.com/javimosch/linuxify#readme"
 }

@@ -178,9 +178,9 @@ Contributions welcome! Feel free to open issues and pull requests.
 
 ## 🔗 Links
 
-- [GitHub](https://github.com/yourusername/linuxify)
-- [Issues](https://github.com/yourusername/linuxify/issues)
-- [Releases](https://github.com/yourusername/linuxify/releases)
+- [GitHub](https://github.com/javimosch/linuxify)
+- [Issues](https://github.com/javimosch/linuxify/issues)
+- [Releases](https://github.com/javimosch/linuxify/releases)
 
 ---
 
